@@ -31,12 +31,10 @@ const getUserById = (req, res) => {
       throw error;
     }
     else if(results.rows[0]!==undefined){
-      console.log(results.rows[0]);
-      res.status(200).json(results.rows);
+      res.status(200).json(results.rows[0]);
     }
     else{
-      console.log(results.rows[0]);
-      res.status(400).json(`User with id:${id} does not exist!`);
+      res.status(400).json({ "error":`User with id:${id} does not exist!`});
     }
   });
 }
@@ -55,18 +53,18 @@ const createUser = (req, res) => {
                     throw error;
                 }
                 else{
-                    res.status(200).json('User added with email: '+email);
+                    res.status(200).send('User added with email: '+email);
                 }
             })
         }
         else{
-            res.status(200).json('Existing user can not be added. Please change mail.');
+            res.status(400).send('Existing user can not be added. Please change mail.');
         }
     }
   })
 }
 
-//update an existing user
+//update an existing user by id
 const updateUser = (req, res) => {
     const id = parseInt(req.params.id);
     const { name, email } = req.body;
@@ -97,7 +95,12 @@ const updateUser = (req, res) => {
             throw error;;
         }
         else{
+          if(results.rowCount===0){
+            res.status(400).send(`User not deleted with ID: ${id}${toid===undefined?'':'-'+toid}. User with ${id} does not exist.`);
+          }
+          else{
             res.status(200).send(`User deleted with ID: ${id}${toid===undefined?'':'-'+toid}`);
+          }
         }
     })
   }

@@ -4,11 +4,20 @@
   "description": "RESTful API with Node.js, Express, and PostgreSQL",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./index.js"
+    "start": "nodemon ./index.js",
+    "test": "jest"
   },
   "license": "MIT",
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
   "dependencies": {
     "express": "^4.17.1",
-    "pg": "^7.14.0"
+    "jest": "^24.9.0",
+    "pg": "^7.14.0",
+    "supertest": "^4.0.2"
   }
 }
