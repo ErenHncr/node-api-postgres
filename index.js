@@ -5,12 +5,12 @@ const app = express();
 const port = 3000;
 
 // support parsing of application/json type post data
-app.use(bodyParser.json());
-//support parsing of application/x-www-form-urlencoded post data
-app.use(bodyParser.urlencoded({
-    extended: true,
-  })
-);
+//app.use(bodyParser.json());
+app.use(bodyParser.json({
+  type: function() {
+      return true;
+  }
+}));
 app.get('/', (req, res) => {
     res.json({ info: 'Node.js, Express, and Postgres API' });
 });

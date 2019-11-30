@@ -50,19 +50,19 @@ const createUser = (req, res) => {
         if(results.rows[0]===undefined){
             pool.query(`INSERT INTO users (name, email) VALUES ('${name}','${email}')`, (error, result) => {
                 if (error) {
-                    throw error;
+                  throw error;
                 }
                 else{
-                    res.status(200).send('User added with email: '+email);
+                  res.status(200).send('User added with email: '+email);
                 }
             })
         }
         else{
-            res.status(400).send('Existing user can not be added. Please change mail.');
+          res.status(400).send('Existing user can not be added. Please change mail.');
         }
     }
   })
-}
+};
 
 //update an existing user by id
 const updateUser = (req, res) => {
@@ -87,7 +87,7 @@ const updateUser = (req, res) => {
     const id = req.params.id;
     const toid = req.params.toid;
     let query=`DELETE FROM users WHERE id between ${id} and ${toid}`;
-    if(toid===undefined){
+    if(toid===undefined||toid==null){
         query=`DELETE FROM users WHERE id=${id}`;
     }
     pool.query(query, (error, results) => {
