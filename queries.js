@@ -1,3 +1,5 @@
+const { idValidation } = require('./validation.js');
+
 const Pool = require('pg').Pool;
 const pool = new Pool({
   user: 'me',
@@ -6,6 +8,11 @@ const pool = new Pool({
   password: '123456',
   port: 5432,
 })
+
+const isNumber = (n) => {
+ return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+}
+
 
 //display all users
 const getUsers = (req, res) => {
@@ -24,8 +31,10 @@ const getUsers = (req, res) => {
 
 //display a single user
 const getUserById = (req, res) => {
-  const id = parseInt(req.params.id);
-
+  const { error } = idValidation(req.params);
+  if(error) return res.status(400).send(error.details[0].message);
+  
+  const id = req.params.id;
   pool.query(`SELECT * FROM users WHERE id = ${id}`, (error, results) => {
     if (error) {
       throw error;
@@ -79,31 +88,39 @@ const updateUser = (req, res) => {
         else{
           res.status(200).send(`User modified with ID: ${id}.`);
         }
-      }
-    );
+      });
   }
   //delete an existing user
-  const deleteUser = (req, res) => {
-    const id = req.params.id;
-    const toid = req.params.toid;
-    let query=`DELETE FROM users WHERE id between ${id} and ${toid}`;
-    if(toid===undefined||toid==null){
-        query=`DELETE FROM users WHERE id=${id}`;
-    }
+const deleteUser = (req, res) => {
+  const id = req.params.id;
+  const toid = req.params.toid;
+  let query=`DELETE FROM users WHERE id between ${id} and ${toid}`;
+  // if(id===undefined){
+  //   res.status(400).send(`id must be a number`);
+  // }
+  console.log(id);
+  if(toid===undefined||toid==null){
+    query=`DELETE FROM users WHERE id = ${id};`;
+  }
+  if(isNumber(id)){
     pool.query(query, (error, results) => {
-        if (error) {
-            throw error;;
-        }
-        else{
-          if(results.rowCount===0){
-            res.status(400).send(`User not deleted with ID: ${id}${toid===undefined?'':'-'+toid}. User with ${id} does not exist.`);
-          }
-          else{
-            res.status(200).send(`User deleted with ID: ${id}${toid===undefined?'':'-'+toid}`);
-          }
-        }
+    if (error) {
+      throw error;
+    }
+    else{
+      if(results.rowCount===0){
+        res.status(400).send(`User not deleted with ID: ${id}${toid===undefined?'':'-'+toid}. User with ${id} does not exist.`);
+      }
+      else{
+        res.status(200).send(`User deleted with ID: ${id}${toid===undefined?'':'-'+toid}`);
+      }
+    }
     })
   }
+  else{
+    res.status(400).send(`id must be a number`);
+  }
+}
 
   module.exports = {
     getUsers,

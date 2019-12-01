@@ -94,6 +94,7 @@ describe('All Endpoints', () => {
     })  
   });
 
+  
   test('should not delete not existing test user', async() => {
     await request(app)
     .delete(`/users/${fakeUser.id}`)
@@ -101,8 +102,7 @@ describe('All Endpoints', () => {
     .expect(`User not deleted with ID: ${fakeUser.id}. User with ${fakeUser.id} does not exist.`)
     .then((res)=>{
       expect(res.statusCode).toBe(400);
-    })
-    
+    });
   });
 
 });

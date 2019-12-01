@@ -22,8 +22,8 @@ app.put('/users/:id', db.updateUser);
 app.delete('/users/:id/:toid', db.deleteUser);
 app.delete('/users/:id', db.deleteUser);
 
-// app.listen(port,() => {
-//   console.info('App running on port '+port);
-// });
+app.listen(port,() => {
+  console.info('App running on port '+port);
+});
 
 module.exports = app;
