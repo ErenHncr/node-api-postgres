@@ -1,4 +1,4 @@
-const { idValidation } = require('./validation.js');
+const { validate } = require('./validation.js');
 
 const Pool = require('pg').Pool;
 const pool = new Pool({
@@ -31,7 +31,7 @@ const getUsers = (req, res) => {
 
 //display a single user
 const getUserById = (req, res) => {
-  const { error } = idValidation(req.params);
+  const { error } = validate(req.params);
   if(error) return res.status(400).send(error.details[0].message);
   
   const id = req.params.id;
@@ -50,7 +50,11 @@ const getUserById = (req, res) => {
 
 //create a new user
 const createUser = (req, res) => {
+  const { error } = validate(req.body);
+  if(error) return res.status(400).send(error.details[0].message);
+  
   const { name, email } = req.body;
+
   pool.query('SELECT * FROM users WHERE email = $1', [email], (error, results) => {
     if (error) {
         throw error;
@@ -93,12 +97,12 @@ const updateUser = (req, res) => {
   //delete an existing user
 const deleteUser = (req, res) => {
   const id = req.params.id;
-  const toid = req.params.toid;
+  const toid = req.params.id;
+  const { error } = validate(req.params);
+  if(error) return res.status(400).send(error.details[0].message);
+  
   let query=`DELETE FROM users WHERE id between ${id} and ${toid}`;
-  // if(id===undefined){
-  //   res.status(400).send(`id must be a number`);
-  // }
-  console.log(id);
+
   if(toid===undefined||toid==null){
     query=`DELETE FROM users WHERE id = ${id};`;
   }
