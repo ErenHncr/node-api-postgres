@@ -1,6 +1,5 @@
 //VALIDATION
 const Joi = require('@hapi/joi');
-
 //Data Validation
 const validate = data => {
     const idSchema = Joi.object({

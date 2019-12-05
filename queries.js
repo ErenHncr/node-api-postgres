@@ -6,13 +6,26 @@ const pool = new Pool({
   host: 'localhost',
   database: 'api',
   password: '123456',
-  port: 5432,
+  port: 5432
 })
 
-const isNumber = (n) => {
- return !isNaN(parseFloat(n)) && !isNaN(n - 0);
-}
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error acquiring client', err.stack)
+  }
+  client.query('SELECT NOW()', (err, result) => {
+    release()
+    if (err) {
+      return console.error('Error executing query', err.stack)
+    }
+    console.log(result.rows)
+  })
+});
 
+//Number Check
+// const isNumber = (n) => {
+//  return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+// }
 
 //display all users
 const getUsers = (req, res) => {
@@ -79,8 +92,12 @@ const createUser = (req, res) => {
 
 //update an existing user by id
 const updateUser = (req, res) => {
+    const { error } = validate({...req.params, ...req.body});
+    if(error) return res.status(400).send(error.details[0].message);
+
     const id = parseInt(req.params.id);
     const { name, email } = req.body;
+    
     pool.query(`UPDATE users SET name = '${name}', email = '${email}' WHERE id = ${id} AND '${email}' NOT IN (SELECT email FROM users)`,
     (error, results) => {
         if (error) {
@@ -106,8 +123,8 @@ const deleteUser = (req, res) => {
   if(toid===undefined||toid==null){
     query=`DELETE FROM users WHERE id = ${id};`;
   }
-  if(isNumber(id)){
-    pool.query(query, (error, results) => {
+  
+  pool.query(query, (error, results) => {
     if (error) {
       throw error;
     }
@@ -119,11 +136,7 @@ const deleteUser = (req, res) => {
         res.status(200).send(`User deleted with ID: ${id}${toid===undefined?'':'-'+toid}`);
       }
     }
-    })
-  }
-  else{
-    res.status(400).send(`id must be a number`);
-  }
+  });
 }
 
   module.exports = {
