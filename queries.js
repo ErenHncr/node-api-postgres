@@ -18,7 +18,7 @@ pool.connect((err, client, release) => {
     if (err) {
       return console.error('Error executing query', err.stack)
     }
-    console.log(result.rows)
+    //console.log(result.rows)
   })
 });
 
@@ -114,7 +114,7 @@ const updateUser = (req, res) => {
   //delete an existing user
 const deleteUser = (req, res) => {
   const id = req.params.id;
-  const toid = req.params.id;
+  const toid = req.params.toid;
   const { error } = validate(req.params);
   if(error) return res.status(400).send(error.details[0].message);
   
@@ -133,7 +133,8 @@ const deleteUser = (req, res) => {
         res.status(400).send(`User not deleted with ID: ${id}${toid===undefined?'':'-'+toid}. User with ${id} does not exist.`);
       }
       else{
-        res.status(200).send(`User deleted with ID: ${id}${toid===undefined?'':'-'+toid}`);
+        console.log(toid);
+        res.status(200).send(`User deleted with ID: ${id} ${(toid===undefined||toid===null)?'':'-'+toid}`);
       }
     }
   });
