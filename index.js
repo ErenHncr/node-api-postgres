@@ -5,12 +5,12 @@ const app = express();
 const port = 3000;
 
 // support parsing of application/json type post data
-//app.use(bodyParser.json());
-app.use(bodyParser.json({
-  type: function() {
-      return true;
-  }
-}));
+app.use(bodyParser.json());
+// app.use(bodyParser.json({
+//   type: function() {
+//       return true;
+//   }
+// }));
 app.get('/', (req, res) => {
     res.json({ info: 'Node.js, Express, and Postgres API' });
 });
@@ -22,8 +22,8 @@ app.put('/users/:id', db.updateUser);
 app.delete('/users/:id/:toid', db.deleteUser);
 app.delete('/users/:id', db.deleteUser);
 
-app.listen(port,() => {
-  //console.info('App running on port '+port);
-});
+// app.listen(port,() => {
+//   //console.info('App running on port '+port);
+// });
 
 module.exports = app;

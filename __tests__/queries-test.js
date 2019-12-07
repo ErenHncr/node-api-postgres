@@ -1,29 +1,33 @@
-const { validate } = require('../validation.js');
+//const { validate } = require('../validation.js');
 const request = require('supertest');
 const app = require('../index.js');
-const Pool = require('pg').Pool;
-const pool = new Pool({
-  user: 'me',
-  host: 'localhost',
-  database: 'api',
-  password: '123456',
-  port: 5432,
-});
+// const Pool = require('pg').Pool;
+// const pool = new Pool({
+//   user: 'me',
+//   host: 'localhost',
+//   database: 'api',
+//   password: '123456',
+//   port: 5432,
+// });
 
 const testid=21;
 const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 };
 
-const fakeUser={
+let fakeUser={
   id:null,
   name:'test',
   email:'test@example.com'
 };
 describe('All Endpoints', () => {
 
-  test('should return all users', () => {
-    request(app)
+  // beforeEach((done)=>{
+  //   console.log(fakeUser.id);
+  // })
+
+  test('should return all users', async() => {
+    await request(app)
     .get('/users')
     .set('Accept', 'application/json')
     .expect(200)
@@ -37,8 +41,8 @@ describe('All Endpoints', () => {
     });
   });
 
-  test('should return users with id or error', () => {
-    request(app)
+  test('should return users with id or error', async () => {
+    await request(app)
     .get(`/users/${testid}`)
     .set('Accept', 'application/json')
     .then((res)=>{
@@ -59,55 +63,41 @@ describe('All Endpoints', () => {
     });
   });
 
-  test('should create a test user', () => {
-    request(app)
+  test('should create a test user', async () => {
+    await request(app)
     .post('/users')
+    .set('Content-type' , 'application/json')
     .set('Accept', 'application/json')
     .expect(200)
     .send({name:fakeUser.name,email:fakeUser.email})
-    .expect(`User added with email: ${fakeUser.email}`);
+    .then((res) => {
+      fakeUser.id = res.body.id;
+      console.log(res.body.id); 
+    })
   });
 
-  describe('test user id assignment', () => {
-    beforeAll((done) => {
-      pool.query(`SELECT id FROM users WHERE email = '${fakeUser.email}';`, (error, results) => {
-          if (error) {
-            console.log('error');
-          }
-          else{
-            fakeUser.id = results.rows[0].id;   
-            console.log(fakeUser.id);
+  test('should not create existing test user', async () => {
+    await request(app)
+    .post('/users')
+    .set('Accept', 'application/json')
+    .send({name:fakeUser.name,email:fakeUser.email})
+    .expect(400)
+  });
 
-          }       
-            
-         });
-    });
-    test('should not create existing test user', () => {
-      request(app)
-      .post('/users')
-      .set('Accept', 'application/json')
-      .send({name:fakeUser.name,email:fakeUser.email})
-      .expect(400)
-      .expect('Existing user can not be added. Please change mail.');
-    });
+  test('should delete existing test user', async() => {
+    await request(app)
+    .delete(`/users/${fakeUser.id}`)
+    .expect(200)
 
-    test('should delete existing test user', () => {
-      const { error } = validate(fakeUser.id);
-      if(error) expect(true).toBe(false);
-      request(app)
-      .delete(`/users/${fakeUser.id}`)
-      .set('Accept', 'application/json')
-      .expect(200)
-    });
+  });
 
-    test('should not delete not existing test user', () => {
-      const { error } = validate(fakeUser.id);
-      if(error) expect(true).toBe(false);
-      request(app)
-      .delete(`/users/${fakeUser.id}`)
-      .set('Accept', 'application/json')
-      .expect(400)
-    });
+  test('should not delete not existing test user', async() => {
+    await request(app)
+    .delete(`/users/${fakeUser.id}`)
+    //.set('Accept', 'application/json')
+    .expect(400)    
+  });
 
-  })
+
 });
+

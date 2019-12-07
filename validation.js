@@ -28,7 +28,6 @@ const validate = data => {
             .min(4)
             .required()
     });
-
     const checkKeys=Object.keys(data).length;
     switch(checkKeys){
         case 1:

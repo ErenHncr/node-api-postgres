@@ -79,7 +79,14 @@ const createUser = (req, res) => {
                   throw error;
                 }
                 else{
-                  res.status(200).send('User added with email: '+email);
+                  pool.query('SELECT * FROM users WHERE email = $1', [email], (error, results) => {
+                    if (error) {
+                        throw error;
+                    }
+                    else{
+                      res.status(200).json(results.rows[0]);
+                    }
+                  });
                 }
             })
         }
@@ -133,7 +140,6 @@ const deleteUser = (req, res) => {
         res.status(400).send(`User not deleted with ID: ${id}${toid===undefined?'':'-'+toid}. User with ${id} does not exist.`);
       }
       else{
-        console.log(toid);
         res.status(200).send(`User deleted with ID: ${id} ${(toid===undefined||toid===null)?'':'-'+toid}`);
       }
     }
