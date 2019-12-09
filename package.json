@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./index.js",
-    "test": "jest --runInBand --detectOpenHandles"
+    "test": "jest --runInBand"
   },
   "license": "MIT",
   "jest": {

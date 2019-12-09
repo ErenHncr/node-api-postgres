@@ -1,18 +1,22 @@
 //const { validate } = require('../validation.js');
 const request = require('supertest');
 const app = require('../index.js');
-// const Pool = require('pg').Pool;
-// const pool = new Pool({
-//   user: 'me',
-//   host: 'localhost',
-//   database: 'api',
-//   password: '123456',
-//   port: 5432,
-// });
+const Pool = require('pg').Pool;
+const pool = new Pool({
+  user: 'me',
+  host: 'localhost',
+  database: 'api',
+  password: '123456',
+  port: 5432,
+});
 
-const testid=21;
+//Number Check
+// const isNumber = (n) => {
+//  return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+// }
+
 const getRandomInt = (max) => {
-  return Math.floor(Math.random() * Math.floor(max));
+  return (Math.floor(Math.random() * Math.floor(max)));
 };
 
 let fakeUser={
@@ -20,11 +24,9 @@ let fakeUser={
   name:'test',
   email:'test@example.com'
 };
-describe('All Endpoints', () => {
+let randomUser;
 
-  // beforeEach((done)=>{
-  //   console.log(fakeUser.id);
-  // })
+describe('All Endpoints', () => {
 
   test('should return all users', async() => {
     await request(app)
@@ -34,7 +36,7 @@ describe('All Endpoints', () => {
     .then((res)=>{
       expect(res.body.length).toBeGreaterThan(0);
       expect(Array.isArray(res.body)).toBe(true);
-      const randomUser=getRandomInt(res.body.length);
+      randomUser = getRandomInt(res.body.length);
       expect(res.body[randomUser].id).not.toBe(null);
       expect(res.body[randomUser].name).not.toBe(null);
       expect(res.body[randomUser].email).not.toBe(null);
@@ -43,7 +45,7 @@ describe('All Endpoints', () => {
 
   test('should return users with id or error', async () => {
     await request(app)
-    .get(`/users/${testid}`)
+    .get(`/users/${randomUser}`)
     .set('Accept', 'application/json')
     .then((res)=>{
       expect(res.body).not.toBe(null);
@@ -72,7 +74,6 @@ describe('All Endpoints', () => {
     .send({name:fakeUser.name,email:fakeUser.email})
     .then((res) => {
       fakeUser.id = res.body.id;
-      console.log(res.body.id); 
     })
   });
 
@@ -94,7 +95,7 @@ describe('All Endpoints', () => {
   test('should not delete not existing test user', async() => {
     await request(app)
     .delete(`/users/${fakeUser.id}`)
-    //.set('Accept', 'application/json')
+    .set('Accept', 'application/json')
     .expect(400)    
   });
 
