@@ -25,7 +25,7 @@ let fakeUser={
   email:'test@example.com'
 };
 let randomUser;
-
+const madeUpUrl = '/random';
 describe('All Endpoints', () => {
 
   test('should return all users', async() => {
@@ -92,11 +92,18 @@ describe('All Endpoints', () => {
 
   });
 
-  test('should not delete not existing test user', async() => {
+  test('should not delete nonexistent test user', async() => {
     await request(app)
     .delete(`/users/${fakeUser.id}`)
     .set('Accept', 'application/json')
     .expect(400)    
+  });
+
+  test('should get 404 error when nonexistent url requested', async() => {
+    await request(app)
+    .get(`/${madeUpUrl}`)
+    .set('Accept', 'application/json')
+    .expect(404)    
   });
 
 
