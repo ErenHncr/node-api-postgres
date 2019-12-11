@@ -9,18 +9,23 @@ const pool = new Pool({
   port: 5432
 })
 
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error('Error acquiring client', err.stack)
-  }
-  client.query('SELECT NOW()', (err, result) => {
-    release()
-    if (err) {
-      return console.error('Error executing query', err.stack)
-    }
-    //console.log(result.rows)
-  })
-});
+//check database connection
+const checkConn = (req,res,next) => {
+  pool.connect((err, client, release) => {
+    if (err) return res.status(404).send('Database Error: Unable to connect to the database!');
+      // return console.error('Error acquiring client', err.stack)
+    
+    client.query('SELECT NOW()', (err, result) => {
+      release()
+      if (err) return res.status(404).send('Database Error: Unable to execute a query!');
+        // return console.error('Error executing query', err.stack)
+      
+      req.status=200;
+      next();
+      //console.log(result.rows)
+    })
+  });
+}
 
 //Number Check
 // const isNumber = (n) => {
@@ -29,17 +34,19 @@ pool.connect((err, client, release) => {
 
 //display all users
 const getUsers = (req, res) => {
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-    if (error) {
-      throw error;
-    }
-    else if(results.rows[0]!==undefined){
-      res.status(200).json(results.rows);
-    }
-    else{
-      res.status(400).json('No data in database');
-    }
-  });
+  if(req.status===200){
+    pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+      if (error) {
+        //throw error;
+      }
+      else if(results.rows[0]!==undefined){
+        res.status(200).json(results.rows);
+      }
+      else{
+        res.status(400).json('No data in database');
+      }
+    });
+  }
 }
 
 //display a single user
@@ -146,10 +153,11 @@ const deleteUser = (req, res) => {
   });
 }
 
-  module.exports = {
+module.exports = {
     getUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
+    checkConn
   }
