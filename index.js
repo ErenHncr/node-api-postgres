@@ -16,11 +16,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/users',db.checkConn, db.getUsers);
-app.get('/users/:id', db.getUserById);
-app.post('/users', db.createUser);
-app.put('/users/:id', db.updateUser);
-app.delete('/users/:id/:toid', db.deleteUser);
-app.delete('/users/:id', db.deleteUser);
+app.get('/users/:id',db.checkConn, db.getUserById);
+app.post('/users',db.checkConn, db.createUser);
+app.put('/users/:id',db.checkConn, db.updateUser);
+app.delete('/users/:id/:toid',db.checkConn, db.deleteUser);
+app.delete('/users/:id',db.checkConn, db.deleteUser);
 app.use((req,res) => {
     res.status(404).send(`404 Not Found : ${req._parsedUrl.href} requested could not be found on this server!`);
 })

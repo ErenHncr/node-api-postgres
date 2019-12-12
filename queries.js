@@ -34,7 +34,6 @@ const checkConn = (req,res,next) => {
 
 //display all users
 const getUsers = (req, res) => {
-  if(req.status===200){
     pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
       if (error) {
         //throw error;
@@ -46,7 +45,6 @@ const getUsers = (req, res) => {
         res.status(400).json('No data in database');
       }
     });
-  }
 }
 
 //display a single user
